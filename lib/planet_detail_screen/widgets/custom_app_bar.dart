@@ -11,11 +11,11 @@ class CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //FIXED HEIGHT CONTAINER
     return Container(
       height: 40.h,
       width: double.infinity,
       child: Stack(
-        // alignment: Alignment.center,
         children: <Widget>[
           Positioned(
             left: 0,
@@ -27,6 +27,7 @@ class CustomAppBar extends StatelessWidget {
               ),
             ),
           ),
+          //TITLE IF NEEDED
           // Align(
           //   child: Hero(
           //     tag: planet.name,

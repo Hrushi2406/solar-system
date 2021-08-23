@@ -5,8 +5,9 @@ import 'package:solar/planet_detail_screen/widgets/custom_app_bar.dart';
 import 'package:solar/planet_detail_screen/widgets/info_widget.dart';
 
 class PlanetDetailScreen extends StatefulWidget {
-  final Planet planet;
   const PlanetDetailScreen({Key? key, required this.planet}) : super(key: key);
+
+  final Planet planet;
 
   @override
   _PlanetDetailScreenState createState() => _PlanetDetailScreenState();
@@ -15,6 +16,7 @@ class PlanetDetailScreen extends StatefulWidget {
 class _PlanetDetailScreenState extends State<PlanetDetailScreen> {
   @override
   Widget build(BuildContext context) {
+    //WIDTH OF THE DEVICE
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -24,19 +26,19 @@ class _PlanetDetailScreenState extends State<PlanetDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              //BACK BUTTON
               CustomAppBar(planet: widget.planet),
 
               SizedBox(height: 60.h),
 
+              //IMAGE AND NAME WIDGET
               Container(
                 width: double.infinity,
                 height: 400.h,
                 child: Stack(
                   alignment: Alignment.center,
-                  fit: StackFit.passthrough,
                   children: [
-                    //HERO PLANET IMAGE
-
+                    //SLIDE IN FROM LEFT TRANSITION
                     TweenAnimationBuilder<Offset>(
                       tween: Tween<Offset>(
                           begin: Offset(0, 0), end: Offset(width / 1.85, 0)),
@@ -47,7 +49,6 @@ class _PlanetDetailScreenState extends State<PlanetDetailScreen> {
                         return Positioned(
                           width: 150.w,
                           left: value!.dx,
-                          // -width / -1.85,
                           child: FittedBox(
                             child: Text(
                               widget.planet.name,
@@ -61,14 +62,17 @@ class _PlanetDetailScreenState extends State<PlanetDetailScreen> {
                         );
                       },
                     ),
+
+                    //HERO PLANET IMAGE
                     Positioned(
                       top: 0,
+                      //HALF OF THE WITH OF SCREEN
                       left: -width / 2,
                       child: Hero(
                         tag: widget.planet.image,
                         child: Image.asset(
                           widget.planet.image,
-                          width: MediaQuery.of(context).size.width,
+                          width: width,
                         ),
                       ),
                     ),
@@ -78,18 +82,20 @@ class _PlanetDetailScreenState extends State<PlanetDetailScreen> {
 
               SizedBox(height: 30.h),
 
+              //SLIDE IN FROM BOTTOM ANIMATION
               TweenAnimationBuilder<Offset>(
                 tween:
                     Tween<Offset>(begin: Offset(0, 500.h), end: Offset(0, 0)),
-                // Tween<Offset>(begin: Offset(500.w, 0), end: Offset(0, 0)),
                 curve: Curves.fastOutSlowIn,
                 duration: const Duration(milliseconds: 750),
                 builder: (BuildContext context, Offset? value, Widget? child) {
-                  //SLIDE IN TRANSITION WITH TWEEN ANIMATION BUILDER
+                  //TRANSLATE IN Y DIRECTION
                   return Transform.translate(
                     offset: value!,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
+
+                      //PLANET INFO WIDGET
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -140,33 +146,6 @@ class _PlanetDetailScreenState extends State<PlanetDetailScreen> {
                   );
                 },
               ),
-
-              // Positioned(
-              //   top: 70.h,
-              //   left: -MediaQuery.of(context).size.width / 2,
-              //   child: Row(
-              //     children: [
-              //       Hero(
-              //         tag: widget.planet.image,
-              //         child: Image.asset(
-              //           widget.planet.image,
-              //           width: MediaQuery.of(context).size.width,
-              //         ),
-              //       ),
-              //       SizedBox(width: 40.w),
-              //       FittedBox(
-              //         child: Text(
-              //           widget.planet.name,
-              //           style: TextStyle(
-              //             color: Colors.white,
-              //             fontSize: 48.sp,
-              //             fontWeight: FontWeight.w700,
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           ),
         ),

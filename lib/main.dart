@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:solar/splash_screen/splash_screen.dart';
+
+import 'home_screen/home_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           fontFamily: 'CircularStd',
         ),
-        home: SplashScreen(),
+        home: HomeScreen(),
       ),
     );
   }

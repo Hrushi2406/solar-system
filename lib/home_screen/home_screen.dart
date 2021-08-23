@@ -130,15 +130,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-
-          //BACK BUTTON
-          Positioned(
-            top: 30.h,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
         ],
       ),
     );
