@@ -32,9 +32,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void navigate() {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PlanetDetailScreen(planet: planets[_currentIndex])));
+  void navigate(Planet planet) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 400),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            PlanetDetailScreen(planet: planet),
+      ),
+    );
   }
 
   @override
@@ -99,17 +109,23 @@ class _HomeScreenState extends State<HomeScreen> {
               //OPACITY VALUE FOR PLANETS DEPENDS ON SCALE
               final opacity = _scale.clamp(0.0, 1.0);
 
-              return Transform(
-                alignment: Alignment.bottomCenter,
-                transform: Matrix4.identity()
-                  ..setEntry(3, 2, 0.001)
-                  ..translate(0.0, -200.h * value, 1000.h * value)
-                  ..scale(_scale),
-                child: Opacity(
-                  opacity: opacity,
-                  child: GestureDetector(
-                      onTap: navigate,
-                      child: Image.asset(planets[index - 1].image)),
+              final planet = planets[index - 1];
+
+              return Hero(
+                tag: planet.image,
+                child: Transform(
+                  alignment: Alignment.bottomCenter,
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, 0.001)
+                    ..translate(0.0, -200.h * value, 1000.h * value)
+                    ..scale(_scale),
+                  child: Opacity(
+                    opacity: opacity,
+                    child: GestureDetector(
+                      onTap: () => navigate(planet),
+                      child: Image.asset(planet.image),
+                    ),
+                  ),
                 ),
               );
             },
@@ -142,36 +158,45 @@ class PlanetInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
-      top: 80.h,
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: Column(
-            children: [
-              Text(
-                planets[_currentIndex].name,
-                style: TextStyle(
-                  fontSize: 32.sp,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                ),
+    return TweenAnimationBuilder<Offset>(
+      tween: Tween<Offset>(begin: Offset(0, -30.h), end: Offset(0, 80.h)),
+      curve: Curves.fastOutSlowIn,
+      duration: const Duration(milliseconds: 650),
+      builder: (BuildContext context, Offset? value, Widget? child) {
+        // return Container();
+        return Positioned.fill(
+          // top: 80.h,
+          top: value!.dy,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Column(
+                children: [
+                  Text(
+                    planets[_currentIndex].name,
+                    style: TextStyle(
+                      fontSize: 32.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  Text(
+                    planets[_currentIndex].description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: Colors.white,
+                      // fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 20.h),
-              Text(
-                planets[_currentIndex].description,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: Colors.white,
-                  // fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
