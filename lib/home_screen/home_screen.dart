@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:solar/models/data.dart';
+import 'package:solar/models/planet.dart';
+import 'package:solar/planet_detail_screen/planet_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,44 +14,51 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _pageController = PageController(
-    viewportFraction: 0.4,
-  );
-
+  //PAGE VALUE TO POSITION IMAGE
   double _currentPageValue = 0;
+  //PLANETS DATA
+  final List<Planet> planets = planetsData;
+  //CURRENT INDEX
+  int _currentIndex = planetsData.length;
+  //SHOW PLANET INFO AFTER ANIMATION IS COMPLETED
+  bool _showInfo = false;
+  //PAGE VIEW CONTROLLER
+  late final _pageController;
 
-  final List<String> _images = [
-    'sun.png',
-    'mercury.png',
-    'venus.png',
-    'earth.png',
-    'mars.png',
-    'belt.png',
-    'jupiter.png',
-    'saturn.png',
-    'uranus.png',
-    'neptune.png',
-    'pluto.png'
-  ];
-
+//GET THE PAGE VALUE AND STORE IT IN STATE
   void _pageListner() {
     setState(() {
-      // print('PAGE');
-      // print(_pageController.page);
       _currentPageValue = _pageController.page!;
     });
+  }
+
+  void navigate() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => PlanetDetailScreen(planet: planets[_currentIndex])));
   }
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(
+      initialPage: planets.length,
+      viewportFraction: 0.4,
+    );
     _pageController.addListener(_pageListner);
-    scheduleMicrotask(() {
+
+    scheduleMicrotask(() async {
+      //INITIAL PLANET ANIMATIONS
       _pageController.animateToPage(
-        _images.length - 1,
-        duration: const Duration(milliseconds: 5000),
-        curve: Curves.easeIn,
+        0,
+        duration: const Duration(milliseconds: 6000),
+        curve: Curves.fastOutSlowIn,
       );
+
+      await Future.delayed(Duration(milliseconds: 6000));
+      //AFTER ANIMATION IS COMPLETE SHOW THE INFO
+      _showInfo = true;
+
+      setState(() {});
     });
   }
 
@@ -64,43 +74,42 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          ///
+          //PLANET INFO
+          if (_currentIndex != 11 && _showInfo)
+            PlanetInfo(planets: planets, currentIndex: _currentIndex),
+
+          //PAGE VIEW OF IMAGES
           PageView.builder(
             controller: _pageController,
             scrollDirection: Axis.vertical,
-            itemCount: _images.length + 1,
+            onPageChanged: (int i) {
+              _currentIndex = i;
+              setState(() {});
+            },
+            itemCount: planets.length + 1,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return SizedBox();
               }
+
+              //ACTIVE PLANET HAS VALUE OF 0, TO POSITION PLANTS
               final value = _currentPageValue - index + 1;
-
-              print("INDEX ${index}");
-              print("PAGE VALUE ${_currentPageValue}");
-              print("VALUE ${_currentPageValue - index + 1}");
-
-              // final _scale = -value * 0.2 + 1;
+              //SCALING FRACTION FOR PLANETS
               final _scale = -0.8 * (value) + 1.2;
-              // final _scale = 1.2;
-              // final height = MediaQuery.of(context).size.height;
+              //OPACITY VALUE FOR PLANETS DEPENDS ON SCALE
               final opacity = _scale.clamp(0.0, 1.0);
 
               return Transform(
                 alignment: Alignment.bottomCenter,
-
-                // alignment: Alignment.center,
                 transform: Matrix4.identity()
                   ..setEntry(3, 2, 0.001)
                   ..translate(0.0, -200.h * value, 1000.h * value)
-                  // ..translate(0.0, 150 * (value == 2 ? 1000 : value),
-                  // 1000 * (value == 2 ? 2000 : value))
                   ..scale(_scale),
                 child: Opacity(
                   opacity: opacity,
-                  // color: Colors.red,
-                  child: Image.asset(
-                    'assets/images/${_images[index - 1]}',
-                  ),
+                  child: GestureDetector(
+                      onTap: navigate,
+                      child: Image.asset(planets[index - 1].image)),
                 ),
               );
             },
@@ -115,6 +124,53 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class PlanetInfo extends StatelessWidget {
+  const PlanetInfo({
+    Key? key,
+    required this.planets,
+    required int currentIndex,
+  })  : _currentIndex = currentIndex,
+        super(key: key);
+
+  final List<Planet> planets;
+  final int _currentIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      top: 80.h,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: Column(
+            children: [
+              Text(
+                planets[_currentIndex].name,
+                style: TextStyle(
+                  fontSize: 32.sp,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              Text(
+                planets[_currentIndex].description,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.white,
+                  // fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
