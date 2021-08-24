@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 class Planet {
   final String name;
   final String description;
